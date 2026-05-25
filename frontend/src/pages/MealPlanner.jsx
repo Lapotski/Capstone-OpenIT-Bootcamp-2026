@@ -4,14 +4,17 @@ const INITIAL_MEALS = [
   { id: 1, name: 'Avocado Toast & Eggs', type: 'breakfast', calories: 350, price: 5 },
   { id: 2, name: 'Buttermilk Pancakes', type: 'breakfast', calories: 450, price: 8 },
   { id: 3, name: 'Grilled Chicken Salad', type: 'lunch', calories: 520, price: 12 },
-  { id: 4, name: 'Quinoa Buddha Bowl', type: 'lunch', calories: 480, price: 10},
-  { id: 5, name: 'Pan-Seared Salmon', type: 'dinner', calories: 650, price: 18},
-  { id: 6, name: 'Ribeye Steak & Veggies', type: 'dinner', calories: 800, price: 25,},
+  { id: 4, name: 'Quinoa Buddha Bowl', type: 'lunch', calories: 480, price: 10 },
+  { id: 5, name: 'Pan-Seared Salmon', type: 'dinner', calories: 650, price: 18 },
+  { id: 6, name: 'Ribeye Steak & Veggies', type: 'dinner', calories: 800, price: 25 },
 ];
 
-export default function MealPlanner() {
+const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+export default function MealPlanner({ onAddToPlan }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [weeklyBudget, setWeeklyBudget] = useState(''); // Default empty
+  const [selectedDays, setSelectedDays] = useState({});
 
   // Filter Logic: Checked against type AND checks if the dish price fits within the weekly budget
   const filteredMeals = INITIAL_MEALS.filter((meal) => {
@@ -77,6 +80,31 @@ export default function MealPlanner() {
               <div className="card-content">
                 <h3 className="meal-title">{meal.name}</h3>
                 <span className="meal-badge">{meal.type}</span>
+                <div className="planner-card-actions">
+                  <select
+                    className="plan-day-dropdown"
+                    value={selectedDays[meal.id] || DAYS_OF_WEEK[0]}
+                    onChange={(e) =>
+                      setSelectedDays((current) => ({
+                        ...current,
+                        [meal.id]: e.target.value,
+                      }))
+                    }
+                  >
+                    {DAYS_OF_WEEK.map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    className="action-button"
+                    onClick={() => onAddToPlan(meal, selectedDays[meal.id] || DAYS_OF_WEEK[0])}
+                  >
+                    Add to Plan
+                  </button>
+                </div>
                 <div className="card-details">
                   <span className="meal-price">₱    {meal.price}</span>
                 </div>
