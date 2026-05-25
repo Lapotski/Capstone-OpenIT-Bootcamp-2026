@@ -182,3 +182,234 @@
     border-right-color: var(--border);
   }
 }
+
+/* --- Global App Layout Shell --- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+}
+
+/* --- Header Component --- */
+.site-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-logo {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
+}
+
+/* --- Footer Component --- */
+.site-footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 24px 0;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-text {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.footer-links {
+  display: flex;
+  gap: 16px;
+}
+
+.footer-link {
+  text-decoration: none;
+  color: #94a3b8;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #64748b;
+}
+
+/* --- Meal Planner Page Layout --- */
+.planner-container {
+  padding: 32px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.planner-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.planner-header h2 {
+  margin: 0 0 8px 0;
+  color: #0f172a;
+  font-size: 28px;
+}
+
+.planner-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+/* Controls Sidebar Panel (Budget & Filter Dropdown) */
+.controls-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 32px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+}
+
+.control-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.budget-input, .filter-dropdown {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+  background-color: #fff;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.budget-input:focus, .filter-dropdown:focus {
+  border-color: #4f46e5;
+}
+
+/* Meals Grid Layout */
+.meals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.meal-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  transition: transform 0.2s;
+}
+
+.meal-card:hover {
+  transform: translateY(-2px);
+}
+
+.card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 16px;
+}
+
+.meal-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: #f1f5f9;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.meal-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.card-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.meal-calories {
+  color: #64748b;
+}
+
+.meal-price {
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 16px;
+}
