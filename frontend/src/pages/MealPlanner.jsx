@@ -31,91 +31,93 @@ export default function MealPlanner({ onAddToPlan }) {
         <p>Set your budget and filter your structure effortlessly</p>
       </header>
 
-      {/* Input controls Panel */}
-      <div className="controls-panel">
-        <div className="control-group">
-          <label htmlFor="budget">Weekly Budget (₱)</label>
-          <input
-            id="budget"
-            type="number"
-            className="budget-input"
-            value={weeklyBudget}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === '') {
-                setWeeklyBudget('');
-              } else {
-                const num = Number(val);
-                if (!isNaN(num)) {
-                  setWeeklyBudget(num);
+      <div className="planner-content">
+        {/* Input controls Panel */}
+        <div className="controls-panel">
+          <div className="control-group">
+            <label htmlFor="budget">Weekly Budget (₱)</label>
+            <input
+              id="budget"
+              type="number"
+              className="budget-input"
+              value={weeklyBudget}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '') {
+                  setWeeklyBudget('');
+                } else {
+                  const num = Number(val);
+                  if (!isNaN(num)) {
+                    setWeeklyBudget(num);
+                  }
                 }
-              }
-            }}
-            placeholder="Enter budget"
-            min="0"
-          />
+              }}
+              placeholder="Enter budget"
+              min="0"
+            />
+          </div>
+
+          <div className="control-group">
+            <label htmlFor="mealType">Meal Type</label>
+            <select
+              id="mealType"
+              className="filter-dropdown"
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+            >
+              <option value="all">All Meals</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+            </select>
+          </div>
         </div>
 
-        <div className="control-group">
-          <label htmlFor="mealType">Meal Type</label>
-          <select
-            id="mealType"
-            className="filter-dropdown"
-            value={activeFilter}
-            onChange={(e) => setActiveFilter(e.target.value)}
-          >
-            <option value="all">All Meals</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="dinner">Dinner</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Meals Grid Output */}
-      <div className="meals-grid">
-        {filteredMeals.length > 0 ? (
-          filteredMeals.map((meal) => (
-            <div key={meal.id} className="meal-card">
-              <div className="card-content">
-                <h3 className="meal-title">{meal.name}</h3>
-                <span className="meal-badge">{meal.type}</span>
-                <div className="planner-card-actions">
-                  <select
-                    className="plan-day-dropdown"
-                    value={selectedDays[meal.id] || DAYS_OF_WEEK[0]}
-                    onChange={(e) =>
-                      setSelectedDays((current) => ({
-                        ...current,
-                        [meal.id]: e.target.value,
-                      }))
-                    }
-                  >
-                    {DAYS_OF_WEEK.map((day) => (
-                      <option key={day} value={day}>
-                        {day}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    className="action-button"
-                    onClick={() => onAddToPlan(meal, selectedDays[meal.id] || DAYS_OF_WEEK[0])}
-                  >
-                    Add to Plan
-                  </button>
-                </div>
-                <div className="card-details">
-                  <span className="meal-price">₱    {meal.price}</span>
+        {/* Meals Grid Output */}
+        <div className="meals-grid">
+          {filteredMeals.length > 0 ? (
+            filteredMeals.map((meal) => (
+              <div key={meal.id} className="meal-card">
+                <div className="card-content">
+                  <h3 className="meal-title">{meal.name}</h3>
+                  <span className="meal-badge">{meal.type}</span>
+                  <div className="planner-card-actions">
+                    <select
+                      className="plan-day-dropdown"
+                      value={selectedDays[meal.id] || DAYS_OF_WEEK[0]}
+                      onChange={(e) =>
+                        setSelectedDays((current) => ({
+                          ...current,
+                          [meal.id]: e.target.value,
+                        }))
+                      }
+                    >
+                      {DAYS_OF_WEEK.map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      className="action-button"
+                      onClick={() => onAddToPlan(meal, selectedDays[meal.id] || DAYS_OF_WEEK[0])}
+                    >
+                      Add to Plan
+                    </button>
+                  </div>
+                  <div className="card-details">
+                    <span className="meal-price">₱    {meal.price}</span>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="no-results">
+              No meals found matching your current budget or type filter requirements. Try increasing your weekly budget limit.
             </div>
-          ))
-        ) : (
-          <div className="no-results">
-            No meals found matching your current budget or type filter requirements. Try increasing your weekly budget limit.
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import { HiUser } from "react-icons/hi";
+
 export default function Header({ activePage, onNavigate }) {
   return (
     <header className="site-header">
@@ -24,7 +26,7 @@ export default function Header({ activePage, onNavigate }) {
             </button>
           </nav>
           <div className="header-profile">
-            <div className="header-avatar" style={{ fontSize: '24px' }}>👤</div>
+            <div className="header-avatar" style={{ fontSize: '24px' }}><HiUser /></div>
           </div>
         </div>
       </div>
