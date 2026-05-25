@@ -204,8 +204,8 @@
 }
 
 .header-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0 24px;
   height: 64px;
   display: flex;
@@ -221,6 +221,46 @@
   font-weight: 700;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-nav-link {
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.header-nav-link:hover,
+.header-nav-link:focus-visible {
+  background-color: #eef2ff;
+  outline: none;
+}
+
+.header-nav-link.active {
+  background-color: #4f46e5;
+  color: #ffffff;
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
+}
+
 .header-avatar {
   width: 36px;
   height: 36px;
@@ -234,6 +274,206 @@
   font-size: 14px;
 }
 
+.planner-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.plan-day-dropdown {
+  min-width: 140px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background-color: #fff;
+  color: #1e293b;
+}
+
+.action-button {
+  border: none;
+  background-color: #4f46e5;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover,
+.action-button:focus-visible {
+  background-color: #4338ca;
+}
+
+.plans-page {
+  padding: 32px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.plans-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.plans-header h2 {
+  margin: 0 0 8px 0;
+  color: #0f172a;
+  font-size: 28px;
+}
+.plan-day-section {
+  margin-bottom: 28px;
+}
+
+.plan-day-section h3 {
+  margin: 0 0 16px 0;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.plan-items-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.plan-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid #e2e8f0;
+  padding: 18px;
+  border-radius: 14px;
+  background-color: #ffffff;
+}
+
+.plan-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.plan-type {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.empty-day {
+  color: #64748b;
+  font-size: 15px;
+  padding: 12px 0 0 0;
+}
+
+.remove-button {
+  background-color: #ef4444;
+}
+
+.remove-button:hover,
+.remove-button:focus-visible {
+  background-color: #dc2626;
+}
+
+/* Plans table layout */
+.plans-table-wrap {
+  overflow-x: auto;
+  padding: 8px 0 24px 0;
+}
+
+.plans-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.plans-table thead th {
+  text-align: left;
+  padding: 12px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.plans-table tbody td {
+  vertical-align: top;
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  min-height: 72px;
+}
+
+.plans-cell .plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-cell {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.plans-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.plan-day-section {
+  margin-bottom: 28px;
+}
+
+.plan-day-section h3 {
+  margin: 0 0 16px 0;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.plan-items-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.plan-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid #e2e8f0;
+  padding: 18px;
+  border-radius: 14px;
+  background-color: #ffffff;
+}
+
+.plan-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.plan-type {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.empty-day {
+  color: #64748b;
+  font-size: 15px;
+  padding: 12px 0 0 0;
+}
+
+.remove-button {
+  background-color: #ef4444;
+}
+
+.remove-button:hover,
+.remove-button:focus-visible {
+  background-color: #dc2626;
+}
+
 /* --- Footer Component --- */
 .site-footer {
   background-color: #ffffff;
@@ -243,8 +483,8 @@
 }
 
 .footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0 24px;
   display: flex;
   justify-content: space-between;
@@ -278,8 +518,8 @@
 /* --- Meal Planner Page Layout --- */
 .planner-container {
   padding: 32px 24px;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .planner-header {
