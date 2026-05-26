@@ -7,7 +7,7 @@ namespace MealPlanner.Services;
  
 public class UserService(
     UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager    // ← add SignInManager
+    SignInManager<ApplicationUser> signInManager
 ) : IUserService
 {
     public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto dto)
@@ -87,7 +87,6 @@ public class UserService(
         Id           = u.Id,
         DisplayName  = u.DisplayName,
         Email        = u.Email ?? string.Empty,
-        WeeklyBudget = u.WeeklyBudget,
-        Token        = string.Empty    // cookie-based auth — no token needed
+        WeeklyBudget = u.WeeklyBudget
     };
 }

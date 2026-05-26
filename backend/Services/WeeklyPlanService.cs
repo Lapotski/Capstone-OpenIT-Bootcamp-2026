@@ -37,7 +37,6 @@ public class WeeklyPlanService(AppDbContext db) : IWeeklyPlanService
         db.WeeklyPlans.Add(plan);
         await db.SaveChangesAsync();
 
-        // Return with empty items list — items are added separately
         plan.MealPlanItems = [];
         return ToDto(plan);
     }

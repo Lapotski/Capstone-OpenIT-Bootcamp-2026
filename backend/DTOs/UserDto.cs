@@ -25,7 +25,6 @@ public class LoginResponseDto
     public string DisplayName { get; set;} = string.Empty;
     public string Email { get; set;} = string.Empty;
     public decimal WeeklyBudget { get; set; }
-    public string Token { get; set; } = string.Empty;
 }
 
 // POST /api/login — what the client sends to log in
