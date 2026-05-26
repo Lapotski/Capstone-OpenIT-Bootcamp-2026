@@ -6,7 +6,7 @@ public class WeeklyPlanResponseDto
     public string Name { get; set; } = string.Empty;
     public DateOnly WeekStart { get; set; }
     public bool IsActive { get; set; }
-    public decimal TotalWeeklyCost { get; set; }   // sum of all MealPlanItem costs, computed server-side
+    public decimal TotalWeeklyCost { get; set; } 
     public List<MealPlanItemResponseDto> MealPlanItems { get; set; } = [];
 }
 
@@ -18,7 +18,7 @@ public class WeeklyPlanCreateDto
     public DateOnly WeekStart { get; set; }
 }
 
-// PATCH /api/weekly-plans/{id} — rename or toggle active state
+// PATCH /api/weekly-plans/{id}
 public class WeeklyPlanPatchDto
 {
     public string? Name { get; set; }

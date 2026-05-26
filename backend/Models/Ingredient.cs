@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 namespace MealPlanner.Models;
 
 public class Ingredient
@@ -22,8 +21,6 @@ public class RecipeIngredient
     public int RecipeId { get; set; }
     public int IngredientId { get; set; }
     public decimal Quantity { get; set; }
-
-    // Can override the ingredient's default unit per recipe (e.g. "cups" instead of "ml")
     public string Unit { get; set; } = string.Empty;
 
     public Recipe Recipe { get; set; } = null!;
