@@ -59,10 +59,21 @@ body {
   align-items: center;
   justify-content: space-between;
 }
-.header-logo { display: flex; align-items: center; font-size: 1.125rem; color: var(--text); }
-.header-actions { display: flex; align-items: center; gap: .75rem; }
+.header-logo { 
+  display: flex; 
+  align-items: center; 
+  font-size: 1.125rem; 
+  color: var(--text); 
+}
+.header-actions { 
+  display: flex; 
+  align-items: center; 
+  gap: .75rem; }
 
-.header-nav { display: flex; gap: .25rem; }
+.header-nav { 
+  display: flex; 
+  gap: .25rem; 
+}
 .header-nav-link {
   background: none;
   border: none;
@@ -73,12 +84,22 @@ body {
   color: var(--text-muted);
   transition: background .15s, color .15s;
 }
-.header-nav-link:hover  { background: var(--border); color: var(--text); }
-.header-nav-link.active { background: #dcfce7; color: var(--accent); font-weight: 600; }
-.dark .header-nav-link.active { background: #14532d30; }
+.header-nav-link:hover  { 
+  background: var(--border); 
+  color: var(--text); 
+}
+.header-nav-link.active { 
+  background: #dcfce7; 
+  color: var(--accent);
+  font-weight: 600; }
+.dark .header-nav-link.active { 
+    background: #14532d30; 
+  }
 
-/* auth buttons */
-.header-auth-btns { display: flex; gap: .5rem; }
+.header-auth-btns { 
+  display: flex; 
+  gap: .5rem; 
+}
 .auth-btn {
   padding: .375rem .9rem;
   border-radius: 7px;
@@ -92,7 +113,6 @@ body {
 .auth-btn--solid { background: var(--accent); color: #fff; }
 .auth-btn--solid:hover { background: var(--accent-hover); }
 
-/* avatar */
 .header-avatar {
   width: 36px; height: 36px;
   border-radius: 50%;
@@ -180,7 +200,7 @@ textarea.budget-input { resize: vertical; min-height: 80px; }
 /* ── Meal Planner Page ───────────────────────────────────────────────────── */
 .planner-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
 .planner-header { margin-bottom: 1.5rem; }
-.planner-header h2 { font-size: 1.6rem; font-weight: 700; }
+.planner-header h2 { font-size: 1.6rem; font-weight: 700; color: var(--text); }
 .planner-header p  { color: var(--text-muted); font-size: .95rem; }
 
 .planner-content { display: flex; gap: 1.5rem; align-items: flex-start; }
