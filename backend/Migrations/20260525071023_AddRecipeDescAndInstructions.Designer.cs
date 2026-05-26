@@ -3,6 +3,7 @@ using System;
 using MealPlanner.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260525071023_AddRecipeDescAndInstructions")]
+    partial class AddRecipeDescAndInstructions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,7 +176,7 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsGlobal")
+                    b.Property<bool>("IsLutongBahay")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -213,24 +216,6 @@ namespace backend.Migrations
                     b.HasIndex("RecipeId");
 
                     b.ToTable("RecipeIngredients");
-                });
-
-            modelBuilder.Entity("MealPlanner.Models.UserRecipe", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsOwner")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("UserId", "RecipeId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("UserRecipes");
                 });
 
             modelBuilder.Entity("MealPlanner.Models.WeeklyPlan", b =>
@@ -432,25 +417,6 @@ namespace backend.Migrations
                     b.Navigation("Recipe");
                 });
 
-            modelBuilder.Entity("MealPlanner.Models.UserRecipe", b =>
-                {
-                    b.HasOne("MealPlanner.Models.Recipe", "Recipe")
-                        .WithMany("UserRecipes")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MealPlanner.Models.ApplicationUser", "User")
-                        .WithMany("UserRecipes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Recipe");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MealPlanner.Models.WeeklyPlan", b =>
                 {
                     b.HasOne("MealPlanner.Models.ApplicationUser", "User")
@@ -515,8 +481,6 @@ namespace backend.Migrations
 
             modelBuilder.Entity("MealPlanner.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("UserRecipes");
-
                     b.Navigation("WeeklyPlans");
                 });
 
@@ -530,8 +494,6 @@ namespace backend.Migrations
                     b.Navigation("MealPlanItems");
 
                     b.Navigation("RecipeIngredients");
-
-                    b.Navigation("UserRecipes");
                 });
 
             modelBuilder.Entity("MealPlanner.Models.WeeklyPlan", b =>

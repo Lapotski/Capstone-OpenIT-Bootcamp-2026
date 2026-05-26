@@ -8,4 +8,5 @@ public class ApplicationUser : IdentityUser
     public decimal WeeklyBudget { get; set; }
 
     public ICollection<WeeklyPlan> WeeklyPlans { get; set; } = [];
+    public ICollection<UserRecipe> UserRecipes { get; set; } = [];
 }
