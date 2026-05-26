@@ -4,7 +4,6 @@ const BASE = 'http://localhost:5000/api';
 async function req(method, path, body) {
   const res = await fetch(`${BASE}${path}`, {
     method,
-    // CRITICAL: Tells the browser to automatically include and accept HttpOnly cookies
     credentials: 'include', 
     headers: {
       'Content-Type': 'application/json',
@@ -14,11 +13,11 @@ async function req(method, path, body) {
 
   if (res.status === 204) return null;
   
-  const data = await res.json().catch(() => ({}));
+  const text = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw Object.assign(new Error(data.error || res.statusText), { status: res.status, data });
+    throw Object.assign(new Error(text.error || res.statusText), { status: res.status, data: text });
   }
-  return data;
+  return text;
 }
 
 const get   = (path)        => req('GET',   path);
@@ -28,10 +27,7 @@ const del   = (path)        => req('DELETE', path);
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 export const api = {
-  // Check if your register endpoint accepts cookies, otherwise leave it clean
   register: (dto) => post('/users/register', dto),
-  
-  // Enabled the useCookies query parameter globally
   login:    (dto) => post('/users/login?useCookies=true', dto),
   logout:   ()    => post('/users/logout'),
   getMe:    ()    => get('/users/me'),

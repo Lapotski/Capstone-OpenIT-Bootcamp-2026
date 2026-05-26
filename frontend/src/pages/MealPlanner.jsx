@@ -84,7 +84,6 @@ export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange 
               <option value="Breakfast">Breakfast</option>
               <option value="Lunch">Lunch</option>
               <option value="Dinner">Dinner</option>
-              <option value="Ulam">Ulam</option>
               <option value="Snack">Snack</option>
             </select>
           </div>
@@ -96,7 +95,6 @@ export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange 
           </div>
         </div>
 
-        {/* Meals Grid Panel */}
         <div className="meals-grid">
           {loading && <div className="no-results">Loading recipes…</div>}
           {error && <div className="no-results" style={{ color: 'var(--color-danger, #e53e3e)' }}>{error}</div>}
@@ -126,7 +124,6 @@ export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange 
         </div>
       </div>
 
-      {/* Add Recipe Modal Overlay */}
       {showModal && (
         <AddRecipeModal 
           onClose={() => setShowModal(false)} 
