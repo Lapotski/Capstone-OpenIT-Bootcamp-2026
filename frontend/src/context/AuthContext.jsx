@@ -1,38 +1,45 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api, setToken } from '../services/Api';
+import { api } from '../services/Api'; // Cleaned: setToken is removed
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount, try to restore session via stored token
-useEffect(() => {
-//   if (!getToken()) return; // Simply exit without calling state updates
+  // ── Session Restoration ───────────────────────────────────────────────────
+  // On mount, the browser automatically sends the HttpOnly auth cookie to /getMe
+  useEffect(() => {
+    api.getMe()
+      .then((userData) => {
+        setUser(userData);
+      })
+      .catch(() => { 
+        // If the cookie is expired, missing, or invalid, reset user state quietly
+        setUser(null); 
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-  api.getMe()
-    .then(setUser)
-    .catch(() => { setToken(""); setUser(null); })
-    .finally(() => setLoading(false)); // Turn off loading here
-}, []);
-
+  // ── Actions ───────────────────────────────────────────────────────────────
   const login = useCallback(async (email, password) => {
+    // The backend intercepts this payload and establishes the session cookie on response headers
     const res = await api.login({ email, password });
-    setToken(res.token);
-    setUser(res);
+    setUser(res); // Expected response format is now your raw profile data object (no token string needed)
     return res;
   }, []);
 
   const register = useCallback(async (displayName, email, password, weeklyBudget) => {
     const res = await api.register({ displayName, email, password, weeklyBudget });
-    // After register, log in automatically
+    // After register, perform sequential cookie login
     return login(email, password).then(() => res);
   }, [login]);
 
   const logout = useCallback(async () => {
+    // The backend clears or expires the HttpOnly auth cookie on this call
     await api.logout().catch(() => {});
-    setToken('');
     setUser(null);
   }, []);
 
