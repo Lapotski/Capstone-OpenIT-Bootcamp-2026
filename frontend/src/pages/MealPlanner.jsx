@@ -3,7 +3,7 @@
   import { useAuth } from '../context/AuthContext';
 
   const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const EMPTY_FORM   = { name: '', category: 'Breakfast', description: '', instructions: '', estimatedCost: '' };
+  const EMPTY_FORM   = { name: '', category: 'Breakfast', description: '', instructions: '', costPerServing: '' };
 
   export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange }) {
     const { user } = useAuth();
@@ -38,14 +38,14 @@
 
     // ── Budget filter (client-side) ─────────────────────────────────────────────
     const budgetNum = weeklyBudget === '' ? Infinity : Number(weeklyBudget);
-    const filteredRecipes = recipes.filter((r) => (r.estimatedCost ?? 0) <= budgetNum);
+    const filteredRecipes = recipes.filter((r) => (r.costPerServing ?? 0) <= budgetNum);
 
     // ── Add custom recipe ───────────────────────────────────────────────────────
     const handleFormChange = (field, value) => { setForm((f) => ({ ...f, [field]: value })); setFormError(''); };
 
     const handleAddRecipe = async () => {
       if (!form.name.trim())         { setFormError('Recipe name is required.'); return; }
-      if (!form.estimatedCost || isNaN(Number(form.estimatedCost)) || Number(form.estimatedCost) < 0)
+      if (!form.costPerServing || isNaN(Number(form.costPerServing)) || Number(form.costPerServing) < 0)
         { setFormError('Enter a valid cost.'); return; }
 
       setSubmitting(true);
@@ -55,7 +55,7 @@
           category: form.category,
           description: form.description.trim(),
           instructions: form.instructions.trim(),
-          estimatedCost: Number(form.estimatedCost),
+          costPerServing: Number(form.costPerServing),
           ingredientIds: [],
         });
         setRecipes((prev) => [...prev, created]);
@@ -74,7 +74,7 @@
         await api.deleteRecipe(id);
         setRecipes((prev) => prev.filter((r) => r.id !== id));
       } catch {
-        // If we can't delete (e.g. it's a global recipe or in a plan), show nothing — backend returns 403/409
+        // If we can't delete (e.g. it's a global recipe or in a plan), show nothing
       }
     };
 
@@ -144,7 +144,7 @@
                 <div className="card-content">
                   <div className="meal-card-header">
                     <h3 className="meal-title">{recipe.name}</h3>
-                    {recipe.isOwnedByUser && (
+                    {recipe.isOwner && (
                       <button type="button" className="trash-btn" onClick={() => handleDelete(recipe.id)} aria-label={`Delete ${recipe.name}`} title="Delete recipe">🗑️</button>
                     )}
                   </div>
@@ -163,7 +163,7 @@
                     </button>
                   </div>
                   <div className="card-details">
-                    <span className="meal-price">~₱{(recipe.estimatedCost ?? 0).toLocaleString()}</span>
+                    <span className="meal-price">~₱{(recipe.costPerServing ?? 0).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -195,8 +195,8 @@
                   </select>
                 </div>
                 <div className="modal-field">
-                  <label>Estimated Cost (₱) *</label>
-                  <input type="number" placeholder="0" min="0" value={form.estimatedCost} onChange={(e) => handleFormChange('estimatedCost', e.target.value)} className="budget-input" />
+                  <label>Cost Per Serving (₱) *</label>
+                  <input type="number" placeholder="0" min="0" value={form.costPerServing} onChange={(e) => handleFormChange('costPerServing', e.target.value)} className="budget-input" />
                 </div>
                 <div className="modal-field">
                   <label>Description</label>

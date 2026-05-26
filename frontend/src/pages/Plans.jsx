@@ -39,8 +39,7 @@ export default function Plans({ plans: localPlans, onRemove, weeklyBudget }) {
         sunday.setDate(monday.getDate() + 6);
         const created = await api.createPlan({
           name: `Week of ${monday.toLocaleDateString()}`,
-          startDate: monday.toISOString().slice(0, 10),
-          endDate:   sunday.toISOString().slice(0, 10),
+          weekStart: monday.toISOString().slice(0, 10),
         });
         setApiPlan(created);
       }
@@ -75,13 +74,16 @@ export default function Plans({ plans: localPlans, onRemove, weeklyBudget }) {
     const localItems = localPlans
       .filter((p) => p.day === day)
       .filter((p) => !apiItems.some((a) => a.recipeId === p.id))
-      .map((p) => ({ ...p, recipeId: p.id, recipeName: p.name, estimatedCost: p.estimatedCost ?? p.price ?? 0, _source: 'local' }));
+      .map((p) => ({ ...p, recipeId: p.id, recipeName: p.name, estimatedCost: p.costPerServing ?? p.price ?? 0, _source: 'local' }));
 
     acc[day] = [...apiItems, ...localItems];
     return acc;
   }, {});
 
-  const dayTotals  = DAYS_OF_WEEK.reduce((acc, day) => { acc[day] = groupedPlans[day].reduce((s, i) => s + (i.estimatedCost ?? 0), 0); return acc; }, {});
+  const dayTotals = DAYS_OF_WEEK.reduce((acc, day) => {
+    acc[day] = groupedPlans[day].reduce((s, i) => s + (i.totalCost ?? i.estimatedCost ?? 0), 0);
+    return acc;
+  }, {});
   const weekTotal  = Object.values(dayTotals).reduce((s, t) => s + t, 0);
   const overBudget = budget !== null && weekTotal > budget;
   const maxItems   = Math.max(1, ...Object.values(groupedPlans).map((a) => a.length));
@@ -146,7 +148,7 @@ export default function Plans({ plans: localPlans, onRemove, weeklyBudget }) {
                         <div className="plan-card">
                           <div>
                             <h4>{item.recipeName ?? item.name}</h4>
-                            <p className="plan-type">{item.category ?? item.type} • ₱{(item.estimatedCost ?? 0).toLocaleString()}</p>
+                            <p className="plan-type">{item.category ?? item.type} • ₱{(item.totalCost ?? item.estimatedCost ?? 0).toLocaleString()}</p>
                           </div>
                           <button
                             type="button"

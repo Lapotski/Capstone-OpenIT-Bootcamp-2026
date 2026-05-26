@@ -16,25 +16,38 @@ function AppContent() {
 
   // ── When the user adds a recipe to plan, attempt to persist via API ──────────
   const handleAddToPlan = async (recipe, day) => {
-    // Deduplicate locally
     setLocalPlans((prev) => {
       if (prev.some((p) => p.id === recipe.id && p.day === day)) return prev;
       return [...prev, { ...recipe, day }];
     });
-
-    // If logged in, try to persist to the backend weekly plan
+  
     if (user) {
       try {
         const plans = await api.getPlans();
+        let planId;
         if (plans.length > 0) {
-          const latestPlan = plans[plans.length - 1];
-          await api.addPlanItem(latestPlan.id, {
-            recipeId:  recipe.id,
-            dayOfWeek: day,
-            mealSlot:  recipe.category ?? 'Lunch',
+          planId = plans[plans.length - 1].id;
+        } else {
+          const now = new Date();
+          const monday = new Date(now);
+          monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+          const created = await api.createPlan({
+            name: `Week of ${monday.toLocaleDateString()}`,
+            weekStart: monday.toISOString().slice(0, 10),
           });
+          planId = created.id;
         }
-      } catch { /* silently fail — local state still works */ }
+  
+        const DAYS_OF_WEEK = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        await api.addPlanItem(planId, {
+          recipeId:  recipe.id,
+          dayOfWeek: DAYS_OF_WEEK.indexOf(day),
+          mealSlot:  recipe.category ?? 'Lunch',
+          servings:  1,
+        });
+      } catch (err) {
+        console.error('Add to plan failed:', err);
+      }
     }
   };
 
