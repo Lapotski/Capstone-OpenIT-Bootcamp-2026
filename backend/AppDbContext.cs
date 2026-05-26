@@ -19,7 +19,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         if (!optionsBuilder.IsConfigured)
         {
             var connStr = Environment.GetEnvironmentVariable("ConnectionStrings__Default")
+<<<<<<< HEAD
+                ?? "Host=localhost;Port=5432;Database=mealdb;Username=postgres;Password=admin";
+=======
                 ?? "Host=localhost;Port=5432;Database=mealdb;Username=postgres;Password=ccms";
+>>>>>>> da5ce6a0aaa48d478bbaf19a2cf0900ed15d07e0
 
             optionsBuilder.UseNpgsql(connStr);
         }
