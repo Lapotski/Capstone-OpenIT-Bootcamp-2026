@@ -1,64 +1,94 @@
-import { useState } from 'react';
-
-const DEFAULT_MEALS = [
-  { id: 1, name: 'Avocado Toast & Eggs',   type: 'breakfast', calories: 350, price: 5,      custom: false },
-  { id: 2, name: 'Paluwagan',              type: 'breakfast', calories: 450, price: 50, custom: false },
-  { id: 3, name: 'Paldo',                  type: 'lunch',     calories: 520, price: 120,    custom: false },
-  { id: 4, name: 'Quinoa Buddha Bowl',     type: 'lunch',     calories: 480, price: 10,     custom: false },
-  { id: 5, name: 'Pan-Seared Salmon',      type: 'dinner',    calories: 650, price: 8,     custom: false },
-  { id: 6, name: 'Ribeye Steak & Veggies', type: 'dinner',    calories: 800, price: 25,     custom: false },
-];
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '../services/Api';
+import { useAuth } from '../context/AuthContext';
 
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-const EMPTY_FORM = { name: '', type: 'breakfast', ingredients: '', price: '' };
+const EMPTY_FORM   = { name: '', category: 'Breakfast', description: '', instructions: '', estimatedCost: '' };
 
 export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange }) {
-  const [meals, setMeals] = useState(DEFAULT_MEALS);
+  const { user } = useAuth();
+
+  const [recipes, setRecipes]         = useState([]);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedDays, setSelectedDays] = useState({});
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [formError, setFormError] = useState('');
+  const [showModal, setShowModal]     = useState(false);
+  const [form, setForm]               = useState(EMPTY_FORM);
+  const [formError, setFormError]     = useState('');
+  const [submitting, setSubmitting]   = useState(false);
 
+  // ── Fetch recipes from backend ──────────────────────────────────────────────
+  const fetchRecipes = useCallback(async () => {
+    if (!user) return;
+    setLoading(true); setError('');
+    try {
+      const params = {};
+      if (activeFilter !== 'all') params.category = activeFilter;
+      const data = await api.getRecipes(params);
+      setRecipes(data);
+    } catch{
+      setError('Could not load recipes. Is the backend running?');
+    } finally {
+      setLoading(false);
+    }
+  }, [user, activeFilter]);
+
+  useEffect(() => { fetchRecipes(); }, [fetchRecipes]);
+
+  // ── Budget filter (client-side) ─────────────────────────────────────────────
   const budgetNum = weeklyBudget === '' ? Infinity : Number(weeklyBudget);
+  const filteredRecipes = recipes.filter((r) => (r.estimatedCost ?? 0) <= budgetNum);
 
-  const filteredMeals = meals.filter((meal) => {
-    const matchesType = activeFilter === 'all' || meal.type === activeFilter;
-    const fitsWeeklyBudget = meal.price <= budgetNum;
-    return matchesType && fitsWeeklyBudget;
-  });
+  // ── Add custom recipe ───────────────────────────────────────────────────────
+  const handleFormChange = (field, value) => { setForm((f) => ({ ...f, [field]: value })); setFormError(''); };
 
-  const handleDeleteMeal = (id) => {
-    setMeals((prev) => prev.filter((m) => m.id !== id));
-  };
+  const handleAddRecipe = async () => {
+    if (!form.name.trim())         { setFormError('Recipe name is required.'); return; }
+    if (!form.estimatedCost || isNaN(Number(form.estimatedCost)) || Number(form.estimatedCost) < 0)
+      { setFormError('Enter a valid cost.'); return; }
 
-  const handleFormChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    setFormError('');
-  };
-
-  const handleAddRecipe = () => {
-    if (!form.name.trim()) { setFormError('Recipe name is required.'); return; }
-    if (!form.price || isNaN(Number(form.price)) || Number(form.price) < 0) {
-      setFormError('Enter a valid price.'); return;
+    setSubmitting(true);
+    try {
+      const created = await api.createRecipe({
+        name: form.name.trim(),
+        category: form.category,
+        description: form.description.trim(),
+        instructions: form.instructions.trim(),
+        estimatedCost: Number(form.estimatedCost),
+        ingredientIds: [],
+      });
+      setRecipes((prev) => [...prev, created]);
+      setForm(EMPTY_FORM);
+      setShowModal(false);
+    } catch (err) {
+      setFormError(err.data?.error || 'Failed to create recipe.');
+    } finally {
+      setSubmitting(false);
     }
-    if (!form.ingredients.trim()) {
-      setFormError('Recipe ingredients are required.'); return;
-    }
-    const newMeal = {
-      id: Date.now(),
-      name: form.name.trim(),
-      type: form.type,
-      ingredients: form.ingredients.trim(),
-      price: Number(form.price),
-      custom: true,
-    };
-    setMeals((prev) => [...prev, newMeal]);
-    setForm(EMPTY_FORM);
-    setFormError('');
-    setShowModal(false);
   };
+
+  // ── Delete custom recipe ────────────────────────────────────────────────────
+  const handleDelete = async (id) => {
+    try {
+      await api.deleteRecipe(id);
+      setRecipes((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      // If we can't delete (e.g. it's a global recipe or in a plan), show nothing — backend returns 403/409
+    }
+  };
+
+  // ── Unauthenticated fallback ────────────────────────────────────────────────
+  if (!user) {
+    return (
+      <div className="planner-container">
+        <div className="no-results" style={{ margin: '4rem auto', textAlign: 'center' }}>
+          <p style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>👋 Please <strong>log in</strong> or <strong>sign up</strong> to use the Meal Planner.</p>
+          <p style={{ opacity: 0.6 }}>Your recipes and plans are tied to your account.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="planner-container">
@@ -77,36 +107,26 @@ export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange 
               type="number"
               className="budget-input"
               value={weeklyBudget}
-              onChange={(e) => {
-                const val = e.target.value;
-                onBudgetChange(val === '' ? '' : Number(val));
-              }}
+              onChange={(e) => onBudgetChange(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="Enter budget"
               min="0"
             />
           </div>
 
           <div className="control-group">
-            <label htmlFor="mealType">Meal Type</label>
-            <select
-              id="mealType"
-              className="filter-dropdown"
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value)}
-            >
-              <option value="all">All Meals</option>
-              <option value="breakfast">Breakfast</option>
-              <option value="lunch">Lunch</option>
-              <option value="dinner">Dinner</option>
+            <label htmlFor="mealType">Category</label>
+            <select id="mealType" className="filter-dropdown" value={activeFilter} onChange={(e) => setActiveFilter(e.target.value)}>
+              <option value="all">All</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Ulam">Ulam</option>
+              <option value="Snack">Snack</option>
             </select>
           </div>
 
           <div className="control-group control-group-action">
-            <button
-              type="button"
-              className="add-recipe-btn"
-              onClick={() => setShowModal(true)}
-            >
+            <button type="button" className="add-recipe-btn" onClick={() => setShowModal(true)}>
               <span>＋</span> Add Your Own Recipe
             </button>
           </div>
@@ -114,60 +134,40 @@ export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange 
 
         {/* Meals Grid */}
         <div className="meals-grid">
-          {filteredMeals.length > 0 ? (
-            filteredMeals.map((meal) => (
-              <div key={meal.id} className="meal-card">
-                <div className="card-content">
-                  <div className="meal-card-header">
-                    <h3 className="meal-title">{meal.name}</h3>
-                    {meal.custom && (
-                      <button
-                        type="button"
-                        className="trash-btn"
-                        onClick={() => handleDeleteMeal(meal.id)}
-                        aria-label={`Delete ${meal.name}`}
-                        title="Delete recipe"
-                      >
-                        🗑️
-                      </button>
-                    )}
-                  </div>
-                  <span className="meal-badge">{meal.type}</span>
-                  {meal.ingredients && <p className="meal-ingredients">{meal.ingredients}</p>}
-                  <div className="planner-card-actions">
-                    <select
-                      className="plan-day-dropdown"
-                      value={selectedDays[meal.id] || DAYS_OF_WEEK[0]}
-                      onChange={(e) =>
-                        setSelectedDays((current) => ({
-                          ...current,
-                          [meal.id]: e.target.value,
-                        }))
-                      }
-                    >
-                      {DAYS_OF_WEEK.map((day) => (
-                        <option key={day} value={day}>{day}</option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      className="action-button"
-                      onClick={() => onAddToPlan(meal, selectedDays[meal.id] || DAYS_OF_WEEK[0])}
-                    >
-                      Add to Plan
-                    </button>
-                  </div>
-                  <div className="card-details">
-                    <span className="meal-price">~₱{meal.price.toLocaleString()}</span>
-                  </div>
+          {loading && <div className="no-results">Loading recipes…</div>}
+          {error   && <div className="no-results" style={{ color: 'var(--color-danger, #e53e3e)' }}>{error}</div>}
+          {!loading && !error && filteredRecipes.length === 0 && (
+            <div className="no-results">No recipes found. Try adjusting your budget or filter, or add one!</div>
+          )}
+          {!loading && filteredRecipes.map((recipe) => (
+            <div key={recipe.id} className="meal-card">
+              <div className="card-content">
+                <div className="meal-card-header">
+                  <h3 className="meal-title">{recipe.name}</h3>
+                  {recipe.isOwnedByUser && (
+                    <button type="button" className="trash-btn" onClick={() => handleDelete(recipe.id)} aria-label={`Delete ${recipe.name}`} title="Delete recipe">🗑️</button>
+                  )}
+                </div>
+                <span className="meal-badge">{recipe.category}</span>
+                {recipe.description && <p className="meal-ingredients">{recipe.description}</p>}
+                <div className="planner-card-actions">
+                  <select
+                    className="plan-day-dropdown"
+                    value={selectedDays[recipe.id] || DAYS_OF_WEEK[0]}
+                    onChange={(e) => setSelectedDays((s) => ({ ...s, [recipe.id]: e.target.value }))}
+                  >
+                    {DAYS_OF_WEEK.map((day) => <option key={day} value={day}>{day}</option>)}
+                  </select>
+                  <button type="button" className="action-button" onClick={() => onAddToPlan(recipe, selectedDays[recipe.id] || DAYS_OF_WEEK[0])}>
+                    Add to Plan
+                  </button>
+                </div>
+                <div className="card-details">
+                  <span className="meal-price">~₱{(recipe.estimatedCost ?? 0).toLocaleString()}</span>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="no-results">
-              No meals found matching your current budget or type filter. Try increasing your weekly budget or changing the filter.
             </div>
-          )}
+          ))}
         </div>
       </div>
 
@@ -179,56 +179,40 @@ export default function MealPlanner({ onAddToPlan, weeklyBudget, onBudgetChange 
               <h3>Add Your Own Recipe</h3>
               <button type="button" className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
-
             <div className="modal-body">
               <div className="modal-field">
                 <label>Recipe Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Chicken Adobo"
-                  value={form.name}
-                  onChange={(e) => handleFormChange('name', e.target.value)}
-                  className="budget-input"
-                />
+                <input type="text" placeholder="e.g. Chicken Adobo" value={form.name} onChange={(e) => handleFormChange('name', e.target.value)} className="budget-input" />
               </div>
               <div className="modal-field">
-                <label>Meal Type *</label>
-                <select
-                  className="filter-dropdown"
-                  value={form.type}
-                  onChange={(e) => handleFormChange('type', e.target.value)}
-                >
-                  <option value="breakfast">Breakfast</option>
-                  <option value="lunch">Lunch</option>
-                  <option value="dinner">Dinner</option>
+                <label>Category *</label>
+                <select className="filter-dropdown" value={form.category} onChange={(e) => handleFormChange('category', e.target.value)}>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Ulam">Ulam</option>
+                  <option value="Snack">Snack</option>
                 </select>
               </div>
               <div className="modal-field">
-                <label>Price (₱) *</label>
-                <input
-                  type="number"
-                  placeholder="0"
-                  min="0"
-                  value={form.price}
-                  onChange={(e) => handleFormChange('price', e.target.value)}
-                  className="budget-input"
-                />
+                <label>Estimated Cost (₱) *</label>
+                <input type="number" placeholder="0" min="0" value={form.estimatedCost} onChange={(e) => handleFormChange('estimatedCost', e.target.value)} className="budget-input" />
               </div>
               <div className="modal-field">
-                <label>Ingredients *</label>
-                <textarea
-                  placeholder="e.g. chicken, garlic, soy sauce"
-                  value={form.ingredients}
-                  onChange={(e) => handleFormChange('ingredients', e.target.value)}
-                  className="budget-input"
-                />
+                <label>Description</label>
+                <textarea placeholder="Short description…" value={form.description} onChange={(e) => handleFormChange('description', e.target.value)} className="budget-input" />
+              </div>
+              <div className="modal-field">
+                <label>Instructions</label>
+                <textarea placeholder="Steps to prepare…" value={form.instructions} onChange={(e) => handleFormChange('instructions', e.target.value)} className="budget-input" />
               </div>
               {formError && <p className="modal-error">{formError}</p>}
             </div>
-
             <div className="modal-footer">
               <button type="button" className="modal-cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
-              <button type="button" className="action-button" onClick={handleAddRecipe}>Add Recipe</button>
+              <button type="button" className="action-button" onClick={handleAddRecipe} disabled={submitting}>
+                {submitting ? 'Saving…' : 'Add Recipe'}
+              </button>
             </div>
           </div>
         </div>
