@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
+    public DbSet<UserRecipe> UserRecipes => Set<UserRecipe>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -19,7 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         {
             var connStr = Environment.GetEnvironmentVariable("ConnectionStrings__Default")
                 ?? "Host=localhost;Port=5432;Database=mealdb;Username=postgres;Password=ccms";
-                
+
             optionsBuilder.UseNpgsql(connStr);
         }
     }
@@ -62,6 +63,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
              .OnDelete(DeleteBehavior.Restrict);
 
             e.Property(ri => ri.Quantity).HasColumnType("numeric(10,3)");
+        });
+
+        // ── UserRecipe (composite PK, no surrogate Id needed) ────────────────
+        builder.Entity<UserRecipe>(e =>
+        {
+            e.HasKey(ur => new { ur.UserId, ur.RecipeId });
+
+            e.HasOne(ur => ur.User)
+             .WithMany(u => u.UserRecipes)
+             .HasForeignKey(ur => ur.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            // Deleting a recipe removes its UserRecipe rows too
+            e.HasOne(ur => ur.Recipe)
+             .WithMany(r => r.UserRecipes)
+             .HasForeignKey(ur => ur.RecipeId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Recipe>(e =>

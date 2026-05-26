@@ -4,19 +4,23 @@ public class WeeklyPlanResponseDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
+    public DateOnly WeekStart { get; set; }
     public bool IsActive { get; set; }
+    public decimal TotalWeeklyCost { get; set; }   // sum of all MealPlanItem costs, computed server-side
     public List<MealPlanItemResponseDto> MealPlanItems { get; set; } = [];
 }
 
+// POST /api/weekly-plans — client just sends name + week start date
+// Items are added separately via POST /api/weekly-plans/{planId}/items
 public class WeeklyPlanCreateDto
 {
     public string Name { get; set; } = string.Empty;
-    public List<int> MealPlanItemIds { get; set; } = [];
+    public DateOnly WeekStart { get; set; }
 }
 
+// PATCH /api/weekly-plans/{id} — rename or toggle active state
 public class WeeklyPlanPatchDto
 {
     public string? Name { get; set; }
-    public List<int>? MealPlanItemIds { get; set; }
+    public bool? IsActive { get; set; }
 }
