@@ -8,10 +8,10 @@ import Plans from './pages/Plans';
 function App() {
   const [activePage, setActivePage] = useState('recipe');
   const [plans, setPlans] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const [weeklyBudget, setWeeklyBudget] = useState('');
 
-  const handleNavigate = (pageName) => {
-    setActivePage(pageName);
-  };
+  const handleNavigate = (pageName) => setActivePage(pageName);
 
   const handleAddToPlan = (meal, day) => {
     setPlans((currentPlans) => {
@@ -28,13 +28,22 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <Header activePage={activePage} onNavigate={handleNavigate} />
+    <div className={`app-container${darkMode ? ' dark' : ''}`}>
+      <Header
+        activePage={activePage}
+        onNavigate={handleNavigate}
+        darkMode={darkMode}
+        onToggleDark={() => setDarkMode((d) => !d)}
+      />
       <main className="main-content">
         {activePage === 'plans' ? (
-          <Plans plans={plans} onRemove={handleRemoveFromPlan} />
+          <Plans plans={plans} onRemove={handleRemoveFromPlan} weeklyBudget={weeklyBudget} />
         ) : (
-          <MealPlanner onAddToPlan={handleAddToPlan} />
+          <MealPlanner
+            onAddToPlan={handleAddToPlan}
+            weeklyBudget={weeklyBudget}
+            onBudgetChange={setWeeklyBudget}
+          />
         )}
       </main>
       <Footer />
