@@ -1,10 +1,9 @@
-
 export default function RecipeCard({ recipe, currentDay, onAddToPlan, onDayChange }) {
   const displayPrice = recipe.costPerServing ?? 0;
 
   return (
-    <>
-      {/* Category Badge and Description */}
+    <>  
+      <h3 className="meal-title">{recipe.name}</h3>
       <span className="meal-badge">{recipe.category}</span>
       {recipe.description && <p className="meal-ingredients">{recipe.description}</p>}
       

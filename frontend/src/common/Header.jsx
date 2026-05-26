@@ -4,10 +4,10 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Header({ activePage, onNavigate, darkMode, onToggleDark }) {
   const { user, login, register, logout } = useAuth();
-  const [menuOpen, setMenuOpen]   = useState(false);
-  const [modal, setModal]         = useState(null); // 'login' | 'register' | null
-  const [form, setForm]           = useState({ displayName: '', email: '', password: '', weeklyBudget: '' });
-  const [error, setError]         = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [modal, setModal] = useState(null);
+  const [form, setForm] = useState({ displayName: '', email: '', password: '', weeklyBudget: '' });
+  const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const menuRef = useRef(null);
 
