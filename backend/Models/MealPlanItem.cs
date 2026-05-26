@@ -9,7 +9,6 @@ public class MealPlanItem
     // 0 = Monday, 6 = Sunday
     public int DayOfWeek { get; set; }
 
-    // "Almusal", "Tanghalian", "Merienda", "Hapunan"
     public string MealSlot { get; set; } = string.Empty;
     public int Servings { get; set; } = 1;
 

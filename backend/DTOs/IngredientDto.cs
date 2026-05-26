@@ -17,7 +17,7 @@ public class IngredientCreateDto
     public decimal PricePerUnit { get; set; }
 }
 
-// PATCH — all fields optional
+// PATCH /api/ingredients/{id} — all fields optional
 public class IngredientPatchDto
 {
     public string? Name { get; set; }
@@ -25,29 +25,20 @@ public class IngredientPatchDto
     public decimal? PricePerUnit { get; set; }
 }
 
-// GET response — what the server returns
+// Embedded in RecipeResponseDto — shows ingredient detail with quantity used in this recipe
 public class RecipeIngredientResponseDto
 {
+    public int IngredientId { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Unit { get; set; } = string.Empty;
-    public decimal PricePerUnit { get; set; }
     public decimal Quantity { get; set; }
+    public string Unit { get; set; } = string.Empty;    // per-recipe unit override
+    public decimal PricePerUnit { get; set; }
+    public decimal LineTotal { get; set; }              // Quantity * PricePerUnit, computed server-side
 }
 
-// POST /api/recipe-ingredients — what the client sends to create a recipe ingredient
 public class RecipeIngredientCreateDto
 {
-    public string Name { get; set; } = string.Empty;
-    public string Unit { get; set; } = string.Empty;
-    public decimal PricePerUnit { get; set; }
+    public int IngredientId { get; set; }
     public decimal Quantity { get; set; }
-}
-
-// PATCH — all fields optional
-public class RecipeIngredientPatchDto
-{
-    public string? Name { get; set; }
-    public string? Unit { get; set; }
-    public decimal? PricePerUnit { get; set; }
-    public decimal? Quantity { get; set; }
+    public string? Unit { get; set; }   // optional override; falls back to Ingredient.Unit if null
 }
