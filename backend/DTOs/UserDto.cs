@@ -31,7 +31,6 @@ public class LoginResponseDto
 // POST /api/login — what the client sends to log in
 public class LoginRequestDto
 {
-    public string DisplayName { get; set;} = string.Empty;
     public string Email { get; set;} = string.Empty;
     public string Password { get; set;} = string.Empty;
 }
