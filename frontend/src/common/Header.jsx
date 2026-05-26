@@ -35,12 +35,16 @@ export default function Header({ activePage, onNavigate, darkMode, onToggleDark 
     e.preventDefault();
     setSubmitting(true); setError('');
     try {
-      await register(form.displayName, form.email, form.password, Number(form.weeklyBudget) || 0);
-      closeModal();
-    }
-    catch (err) { setError(err.data?.error || 'Registration failed.'); }
-    finally { setSubmitting(false); }
-  };
+      await register(form.displayName, form.email, form.password);
+      if (logout) {
+          await logout(); 
+        }
+        
+        openModal('login'); 
+      }
+      catch (err) { setError(err.data?.error || 'Registration failed.'); }
+      finally { setSubmitting(false); }
+    };
 
   return (
     <>

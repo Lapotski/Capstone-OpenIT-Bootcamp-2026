@@ -1,44 +1,37 @@
 const BASE = 'http://localhost:5000/api';
 
-// ─── Auth token helpers ───────────────────────────────────────────────────────
-let _token = localStorage.getItem('token') || '';
-
-export function setToken(t) {
-  _token = t;
-  if (t) localStorage.setItem('token', t);
-  else localStorage.removeItem('token');
-}
-
-export function getToken() { return _token; }
-
-function authHeaders(extra = {}) {
-  return {
-    'Content-Type': 'application/json',
-    ...(_token ? { Authorization: `Bearer ${_token}` } : {}),
-    ...extra,
-  };
-}
-
+// ─── Request Helper ──────────────────────────────────────────────────────────
 async function req(method, path, body) {
   const res = await fetch(`${BASE}${path}`, {
     method,
-    headers: authHeaders(),
+    // CRITICAL: Tells the browser to automatically include and accept HttpOnly cookies
+    credentials: 'include', 
+    headers: {
+      'Content-Type': 'application/json',
+    },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
+
   if (res.status === 204) return null;
+  
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(data.error || res.statusText), { status: res.status, data });
+  if (!res.ok) {
+    throw Object.assign(new Error(data.error || res.statusText), { status: res.status, data });
+  }
   return data;
 }
 
-const get  = (path)         => req('GET',    path);
-const post = (path, body)   => req('POST',   path, body);
-const patch = (path, body)  => req('PATCH',  path, body);
-const del  = (path)         => req('DELETE', path);
+const get   = (path)        => req('GET',   path);
+const post  = (path, body)  => req('POST',  path, body);
+const patch = (path, body)  => req('PATCH', path, body);
+const del   = (path)        => req('DELETE', path);
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 export const api = {
+  // Check if your register endpoint accepts cookies, otherwise leave it clean
   register: (dto) => post('/users/register', dto),
+  
+  // Enabled the useCookies query parameter globally
   login:    (dto) => post('/users/login?useCookies=true', dto),
   logout:   ()    => post('/users/logout'),
   getMe:    ()    => get('/users/me'),
